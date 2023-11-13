@@ -14,10 +14,10 @@ def error_handler(func):
     return inner
 
 USERS = {}
+
+
 def hello():
-    return "How can I help you?"
-    
-    
+    return "How can I help you?" 
 
 
 def exit_handler():
@@ -54,7 +54,7 @@ def main():
         s = input("...")
         s = s.lower()       
         if s == "hello":
-            print(hello())  
+            print(hello())
         elif re.search(r'add', s):
             new_text = s.replace("add ", "").split(" ")
             print (add(new_text))
@@ -66,9 +66,12 @@ def main():
             print(phone(new_text[1]))
         elif re.search(r'show all ', s):  
             print(show_all())
-        elif s== "good bye" or "close" or "exit":
-           exit_handler()
-           break
+        elif s == "good bye" or "close" or "exit":
+            exit_handler()
+            break
+        elif s:
+            print('No command...')
+        
 if __name__ == "__main__":
 
     main()
