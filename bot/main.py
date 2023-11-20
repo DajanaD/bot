@@ -1,77 +1,67 @@
-import re
-
-def error_handler(func):
-    def inner(*args, **kwargs):
-        try:
-            result = func(*args, **kwargs)
-            return result
-        except KeyError:
-            return 'No user with this name'
-        except ValueError:
-            return 'Give me name and phone please or missing space'
-        except IndexError:
-            return 'Enter user name'
-    return inner
-
-USERS = {}
+from collections import UserDict
 
 
-def hello():
-    return "How can I help you?" 
+class Field:
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return str(self.value)
 
 
-def exit_handler():
-    return "Good bye!"
+class Name(Field):
+    pass
 
 
-@error_handler
-def add(*args, **kwargs):
-    
-    name, phone = args
-    USERS[name] = phone
-    return "Add"
+class Phone(Field):
+   def __init__(self, value):
+        super().__init__(value)
+        if len(str(self.value)) == 10 and str(self.value).isdigit():
+            self.value = value
+        else:
+            raise ValueError('Invalid phone number')
 
-@error_handler
-def change(*args, **kwargs):
-    name, phone = args
-    USERS[name] = phone
-    return "Change"
+class Record:
+    def __init__(self, name):
+        self.name = Name(name)
+        self.phones = []
 
-
-def phone(*args, **kwargs):
-    name = args
-    USERS[name]
+    def add_phone(self, phone_number: str):
+        self.phones.append(Phone(phone_number))
 
 
+    def find_phone(self, phone_number: str):
+        for phone in self.phones:
+            if phone.value == phone_number:
+                return phone
 
-def show_all():
-    for key, value in  USERS.items:
-        f'{key} - {value}'
+
+    def edit_phone(self, old_phone, new_phone):
+        for phone in self.phones:
+            if phone.value == old_phone:
+                phone.value = new_phone
+                return
+        raise ValueError
 
 
-def main():
-    while True:
-        s = input("...")
-        s = s.lower()       
-        if s == "hello":
-            print(hello())
-        elif re.search(r'add', s):
-            new_text = s.replace("add ", "").split(" ")
-            print (add(new_text))
-        elif re.search(r'change', s):
-            new_text = s.replace("change ", "").split(" ")
-            print(change(new_text))
-        elif re.search(r'phone', s):
-            new_text = s.replace("phone ", "").split(" ")
-            print(phone(new_text[1]))
-        elif re.search(r'show all ', s):  
-            print(show_all())
-        elif s == "good bye" or "close" or "exit":
-            exit_handler()
-            break
-        elif s:
-            print('No command...')
+    def remove_phone(self, phone_number):
+        phone  = self.find_phone(phone_number)
+        if phone:
+            self.phones.remove(phone)
+
+    def __str__(self):
+        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
+
+class AddressBook(UserDict):
+    def add_record(self, record: Record):
+        self.data[record.name.value] = record
         
-if __name__ == "__main__":
-
-    main()
+        
+    def find(self, name: Record):
+        for names in self.data:
+            if names == name:
+                return self.data[name]
+            
+            
+    def delete(self, name:Record):
+        if self.data.get(name):
+            del self.data[name]
